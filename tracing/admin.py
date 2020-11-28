@@ -6,9 +6,6 @@ from django.contrib import admin
 # Models
 from .models import Trace, Rule
 
-# Forms
-from .forms import RuleForm
-
 @admin.register(Trace)
 class TraceAdmin(admin.ModelAdmin):
     list_display = ('content_object', 'date', 'user', 'action')
