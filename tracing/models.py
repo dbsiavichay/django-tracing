@@ -31,15 +31,17 @@ class BaseModel(models.Model):
         """Get user by provide username"""
         try:
             user = User.objects.get(username=username)
-            return user.get_full_name() or user.username
+            return user
         except User.DoesNotExist:
             return username
 
-    def get_created_user(self):
+    @property
+    def creation_user(self):
         """Get created user"""
         return self._get_user(self.created_user)
 
-    def get_update_user(self):
+    @property
+    def modification_user(self):
         """Get updated user"""
         return self._get_user(self.modified_user)
 
