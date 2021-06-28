@@ -68,5 +68,4 @@ class TracingMiddleware:
         if request.method == "POST":
             self.thread_local.data = request.POST.dict()
         response = self.get_response(request)
-        
         return response

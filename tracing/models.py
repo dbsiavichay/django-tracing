@@ -3,7 +3,6 @@
 # Django
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.auth import get_user_model
-from django.conf import settings
 from django.db import models
 
 # Models
@@ -60,10 +59,11 @@ class Trace(models.Model):
         DELETE = 3, 'Eliminar'
 
     id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=128, verbose_name="nombre")
     action = models.PositiveSmallIntegerField(
         choices=ActionChoices.choices, verbose_name="acción"
     )
-    message = models.TextField(verbose_name='mensaje')
+    message = models.TextField(verbose_name='detalle')
     content_type = models.ForeignKey(
         "contenttypes.ContentType", 
         on_delete=models.CASCADE,
@@ -74,14 +74,14 @@ class Trace(models.Model):
     )
     content_object = GenericForeignKey("content_type", "object_id")
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        User,
         on_delete=models.PROTECT,
         verbose_name='usuario'
     )
     date = models.DateTimeField(auto_now_add=True, verbose_name='fecha')
 
     def __str__(self):
-        return f"{self.content_object}, {self.get_action_display()}"
+        return self.name
 
     class Meta:
         verbose_name = "Rastro"
@@ -101,4 +101,5 @@ class Rule(BaseModel):
         return f"Regla de {str(self.content_type).lower()}"
 
     class Meta:
+        ordering = ("content_type",)
         verbose_name = "Regla"
