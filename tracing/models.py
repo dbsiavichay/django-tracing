@@ -64,6 +64,8 @@ class Trace(models.Model):
         choices=ActionChoices.choices, verbose_name="acción"
     )
     message = models.TextField(verbose_name='detalle')
+    ip = models.CharField(max_length=32, null=True, verbose_name="dirección IP")
+    os = models.CharField(max_length=32, null=True, verbose_name="sistema operativo")
     content_type = models.ForeignKey(
         "contenttypes.ContentType", 
         on_delete=models.CASCADE,

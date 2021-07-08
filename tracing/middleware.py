@@ -3,32 +3,13 @@
 # Python
 import threading
 
-# Models
-from .models import Rule
-
-
-def load_rules():
-    try:
-        object_list = Rule.objects.filter(is_active=True).values(
-            "content_type__model", "check_create", "check_edit", "check_delete"
-        )
-        rules = {
-            obj.get("content_type__model"): {
-                "check_create": obj.get("check_create"),
-                "check_edit": obj.get("check_edit"),
-                "check_delete": obj.get("check_delete"),
-            }
-            for obj in object_list
-        }
-    except:
-        rules = {}
-    print(f"Se cargaron {len(rules)} reglas.")
-    return rules
+# Local
+from .services import TraceService
 
 
 class TracingMiddleware:
     thread_local = threading.local()
-    rules = load_rules()
+    rules = TraceService.load_rules()
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -43,17 +24,19 @@ class TracingMiddleware:
             return cls.thread_local.data
 
     @classmethod
-    def set_user(cls, user):
-        cls.thread_local.user = user
-
-    @classmethod
-    def get_user(cls):
-        if hasattr(cls.thread_local, "user"):
-            return cls.thread_local.user
+    def get_info(cls):
+        user = cls.thread_local.user if hasattr(cls.thread_local, "user") else None
+        ip = cls.thread_local.ip if hasattr(cls.thread_local, "ip") else None
+        os = cls.thread_local.os if hasattr(cls.thread_local, "os") else None
+        return {
+            "user": user,
+            "ip": ip,
+            "os": os,
+        }
 
     @classmethod
     def reload_rules(cls):
-        cls.rules = load_rules()
+        cls.rules = TraceService.load_rules()
 
     @classmethod
     def get_rule_by_classname(cls, classname):
@@ -64,6 +47,8 @@ class TracingMiddleware:
         # Code to be executed for each request before
         # the view (and later middleware) are called
         self.thread_local.user = request.user
+        self.thread_local.ip = TraceService.get_ip(request)
+        self.thread_local.os = TraceService.get_os(request)
 
         if request.method == "POST":
             self.thread_local.data = request.POST.dict()

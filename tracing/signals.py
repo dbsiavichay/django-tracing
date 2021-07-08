@@ -3,6 +3,7 @@
 # Python
 import json
 from datetime import datetime, date
+from tracing.services import TraceService
 
 # Django
 from django.forms.models import model_to_dict
@@ -76,12 +77,14 @@ def save_log(sender, instance, created, **kwargs):
     diff = get_diff(instance, created)
     if not diff:
         return
-
+    info = TracingMiddleware.get_info()
     options = {
         "name": str(instance),
         "message": json.dumps(diff),
         "content_object": instance,
-        "user": TracingMiddleware.get_user(),
+        "user": info.get("user"),
+        "ip": info.get("ip"),
+        "os": info.get("os"),
     }
     if created and rule.get("check_create"):
         options["action"] = Trace.ActionChoices.CREATE
@@ -125,7 +128,7 @@ def save_user_in_base_model(sender, instance, created, **kwargs):
     post_save.disconnect(save_user_in_base_model)
 
     # Update user
-    user = TracingMiddleware.get_user()
+    user = TracingMiddleware.get_info().get("user", None)
     user = user.username if user else "root"
     if created:
         instance.created_user = user
