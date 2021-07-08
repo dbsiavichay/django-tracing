@@ -1,6 +1,3 @@
-# Python
-import re
-
 # Django
 from django.conf import settings
 
