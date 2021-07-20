@@ -78,8 +78,12 @@ def save_log(sender, instance, created, **kwargs):
     if not diff:
         return
     info = TracingMiddleware.get_info()
+    try:
+        name = str(instance)
+    except:
+        name = "%s (%s)" % (instance._meta.verbose_name.capitalize(), instance.id)
     options = {
-        "name": str(instance),
+        "name": name,
         "message": json.dumps(diff),
         "content_object": instance,
         "user": info.get("user"),
