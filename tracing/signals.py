@@ -3,14 +3,13 @@
 # Python
 import json
 from datetime import datetime, date
-from tracing.services import TraceService
 
 # Django
-from django.forms.models import model_to_dict
 from django.db.models import ImageField
 from django.db.models.fields.files import FieldFile
 from django.db.models.signals import post_save, post_delete, pre_save
 from django.dispatch import receiver
+from django.forms.models import model_to_dict
 
 # Middleware
 from .middleware import TracingMiddleware
@@ -18,8 +17,9 @@ from .middleware import TracingMiddleware
 # Models
 from .models import Trace, Rule, BaseModel
 
-
 """ Util function """
+
+
 def prepare(dict_object):
     for key in dict_object:
         value = dict_object[key]
@@ -30,12 +30,17 @@ def prepare(dict_object):
         elif isinstance(value, list):
             dict_object[key] = tuple(value)
         elif value and (isinstance(value, FieldFile) or isinstance(value, ImageField)):
-            value = value.url if hasattr(value, "url") else value.path if hasattr(value, "path") else ""
+            value = (
+                value.url
+                if hasattr(value, "url")
+                else value.path
+                if hasattr(value, "path")
+                else ""
+            )
             dict_object[key] = value
         elif not value:
             dict_object[key] = ""
     return dict_object
-
 
 
 def get_diff(instance, created):
@@ -47,6 +52,8 @@ def get_diff(instance, created):
 
 
 """Signals for reload rules"""
+
+
 @receiver(post_save, sender=Rule)
 def save_rule(sender, **kwargs):
     TracingMiddleware.reload_rules()
@@ -58,6 +65,8 @@ def delete_rule(sender, **kwargs):
 
 
 """ Signal for presave instance """
+
+
 @receiver(pre_save)
 def presave_log(sender, instance, **kwargs):
     try:
@@ -69,6 +78,8 @@ def presave_log(sender, instance, **kwargs):
 
 
 """ Signal for postsave instance """
+
+
 @receiver(post_save)
 def save_log(sender, instance, created, **kwargs):
     rule = TracingMiddleware.get_rule_by_classname(sender._meta.model_name)
@@ -109,17 +120,26 @@ def save_delete(sender, instance, **kwargs):
         return
     if rule.get("check_delete"):
         message = prepare(model_to_dict(instance))
+        info = TracingMiddleware.get_info()
+        try:
+            name = str(instance)
+        except:
+            name = "%s (%s)" % (instance._meta.verbose_name.capitalize(), instance.id)
         options = {
-            "name": str(instance),
-            "action": Trace.ActionChoices.DELETE,
-            "content_object": instance,
-            "user": TracingMiddleware.get_user(),
+            "name": name,
             "message": json.dumps(message),
+            "content_object": instance,
+            "action": Trace.ActionChoices.DELETE,
+            "user": info.get("user"),
+            "ip": info.get("ip"),
+            "os": info.get("os"),
         }
         Trace.objects.create(**options)
 
 
 """ """
+
+
 @receiver(post_save)
 def save_user_in_base_model(sender, instance, created, **kwargs):
     """Save audit fields"""

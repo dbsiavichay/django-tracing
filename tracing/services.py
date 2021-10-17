@@ -32,15 +32,15 @@ class TraceService:
 
     @classmethod
     def get_ip(cls, request):
-        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
         if x_forwarded_for:
-            ip = x_forwarded_for.split(',')[0]
+            ip = x_forwarded_for.split(",")[0]
         else:
-            ip = request.META.get('REMOTE_ADDR')
+            ip = request.META.get("REMOTE_ADDR")
         return ip
 
     @classmethod
     def get_os(cls, request):
-        user_agent = request.META['HTTP_USER_AGENT']
+        user_agent = request.META.get("HTTP_USER_AGENT")
         os = httpagentparser.simple_detect(user_agent)[0]
         return os
