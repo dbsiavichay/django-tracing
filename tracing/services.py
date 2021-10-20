@@ -1,6 +1,5 @@
-from django.conf import settings
-
 import httpagentparser
+from django.conf import settings
 
 from .models import Rule
 

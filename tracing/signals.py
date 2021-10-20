@@ -1,17 +1,16 @@
 """ Audit signals """
 
 import json
-from datetime import datetime, date
+from datetime import date, datetime
 
 from django.db.models import ImageField
 from django.db.models.fields.files import FieldFile
-from django.db.models.signals import post_save, post_delete, pre_save
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 from django.forms.models import model_to_dict
 
 from .middleware import TracingMiddleware
-
-from .models import Trace, Rule, BaseModel
+from .models import BaseModel, Rule, Trace
 
 """ Util function """
 

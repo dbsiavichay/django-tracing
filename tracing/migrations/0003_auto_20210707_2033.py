@@ -6,18 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('tracing', '0002_auto_20210628_1608'),
+        ("tracing", "0002_auto_20210628_1608"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='trace',
-            name='ip',
-            field=models.CharField(max_length=32, null=True, verbose_name='dirección IP'),
+            model_name="trace",
+            name="ip",
+            field=models.CharField(
+                max_length=32, null=True, verbose_name="dirección IP"
+            ),
         ),
         migrations.AddField(
-            model_name='trace',
-            name='os',
-            field=models.CharField(max_length=32, null=True, verbose_name='sistema operativo'),
+            model_name="trace",
+            name="os",
+            field=models.CharField(
+                max_length=32, null=True, verbose_name="sistema operativo"
+            ),
         ),
     ]

@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('tracing', '0001_initial'),
+        ("tracing", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='rule',
-            options={'ordering': ('content_type',), 'verbose_name': 'Regla'},
+            name="rule",
+            options={"ordering": ("content_type",), "verbose_name": "Regla"},
         ),
         migrations.AddField(
-            model_name='trace',
-            name='name',
-            field=models.CharField(default='', max_length=128, verbose_name='nombre'),
+            model_name="trace",
+            name="name",
+            field=models.CharField(default="", max_length=128, verbose_name="nombre"),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='trace',
-            name='message',
-            field=models.TextField(verbose_name='detalle'),
+            model_name="trace",
+            name="message",
+            field=models.TextField(verbose_name="detalle"),
         ),
     ]

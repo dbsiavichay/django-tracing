@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="django-tracing", # Replace with your own username
+    name="django-tracing",  # Replace with your own username
     version="1.0.6",
     author="Denis Siavichay",
     author_email="dbsiavichay@gmail.com",
@@ -14,7 +14,7 @@ setuptools.setup(
     url="https://github.com/dbsiavichay/django-tracing",
     packages=setuptools.find_packages(),
     install_requires=[
-        'httpagentparser',
+        "httpagentparser",
     ],
     classifiers=[
         "License :: OSI Approved :: MIT License",
