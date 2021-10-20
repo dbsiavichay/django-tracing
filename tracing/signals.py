@@ -1,20 +1,16 @@
 """ Audit signals """
 
-# Python
 import json
 from datetime import datetime, date
 
-# Django
 from django.db.models import ImageField
 from django.db.models.fields.files import FieldFile
 from django.db.models.signals import post_save, post_delete, pre_save
 from django.dispatch import receiver
 from django.forms.models import model_to_dict
 
-# Middleware
 from .middleware import TracingMiddleware
 
-# Models
 from .models import Trace, Rule, BaseModel
 
 """ Util function """
@@ -119,6 +115,10 @@ def save_delete(sender, instance, **kwargs):
     if not rule:
         return
     if rule.get("check_delete"):
+        try:
+            name = str(instance)
+        except:
+            name = "%s (%s)" % (instance._meta.verbose_name.capitalize(), instance.id)
         message = prepare(model_to_dict(instance))
         info = TracingMiddleware.get_info()
         try:
@@ -127,17 +127,14 @@ def save_delete(sender, instance, **kwargs):
             name = "%s (%s)" % (instance._meta.verbose_name.capitalize(), instance.id)
         options = {
             "name": name,
+            "action": Trace.ActionChoices.DELETE,
             "message": json.dumps(message),
             "content_object": instance,
-            "action": Trace.ActionChoices.DELETE,
             "user": info.get("user"),
             "ip": info.get("ip"),
             "os": info.get("os"),
         }
         Trace.objects.create(**options)
-
-
-""" """
 
 
 @receiver(post_save)

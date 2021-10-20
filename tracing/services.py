@@ -1,10 +1,7 @@
-# Django
 from django.conf import settings
 
-# Other libraries
 import httpagentparser
 
-# Local
 from .models import Rule
 
 
