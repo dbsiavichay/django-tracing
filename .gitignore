@@ -5,6 +5,9 @@
 *.lock
 .DS_Store
 .env
+.dockerignore
+docker-compose.yml
+Dockerfile
 build/
 dist/
 *egg-info/
